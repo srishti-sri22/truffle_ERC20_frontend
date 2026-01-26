@@ -7,7 +7,7 @@ import { getProvider } from "@/lib/contracts";
 
 export default function Home() {
   const [isConnecting, setIsConnecting] = useState(false);
-  const { userAddress, isConnected, setUserAddress, setConnected, resetState } = useTokenStore();
+  const { userAddress, isConnected, setUserAddress, setConnected, resetAll} = useTokenStore();
 
   const handleConnect = async () => {
     try {
@@ -27,9 +27,8 @@ export default function Home() {
   };
 
   const handleDisconnect = () => {
-    resetState();
+    resetAll();
     setConnected(false);
-    // You might also want to notify the user
     console.log("Wallet disconnected");
   };
 
@@ -40,7 +39,6 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Header with Connect/Disconnect Button */}
         <header className="mb-16">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between">
             <div className="mb-6 md:mb-0">
@@ -183,8 +181,8 @@ export default function Home() {
         <div className="grid md:grid-cols-3 gap-8 mb-20">
           <div className="h-full p-8 rounded-2xl bg-amber-50 border-2 border-amber-100 shadow-md hover:shadow-lg transition-shadow duration-200">
             <div className="flex items-center gap-4 mb-6">
-              <div className="p-3 rounded-xl">
-                <span className="text-white text-xl"><img className="h-6 w-6" src="../public/token.png" alt="" /></span>
+              <div className="p-3 rounded-xl bg-gradient-to-r from-amber-700 to-amber-800">
+                <span className="text-white text-xl">💧</span>
               </div>
               <h3 className="text-2xl font-bold text-amber-900">Claim Tokens</h3>
             </div>
