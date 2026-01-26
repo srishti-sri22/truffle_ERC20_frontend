@@ -1,17 +1,13 @@
 import { ethers } from "ethers";
 
-// export const TOKEN_ADDRESS = process.env.TOKEN_ADDRESS_SEPOLIA as string;
-// export const FAUCET_ADDRESS = process.env.FAUCET_ADDRESS_SEPOLIA as string;
-export const TOKEN_ADDRESS = "0xfa8D28F3c28b7D4Cc44015bEC986b0c4D63CC7B8";
-export const FAUCET_ADDRESS ="0xe746C6A272D50A90C134a3DE3fAC32f72c9528c1";
+export const TOKEN_ADDRESS = process.env.NEXT_PUBLIC_TOKEN_ADDRESS_SEPOLIA as string;
+export const FAUCET_ADDRESS = process.env.NEXT_PUBLIC_FAUCET_ADDRESS_SEPOLIA as string;
 
-// Add error interfaces for better type safety
 export interface CustomError {
   name: string;
   args: any[];
 }
 
-// Enhanced ABI with custom error definitions
 export const tokenAbi = [
   "constructor(string name_, string symbol_, uint256 initialSupply_)",
   "function allowance(address tokenOwner, address spender) view returns (uint256)",
@@ -68,6 +64,17 @@ export function getProvider() {
   return new ethers.BrowserProvider(window.ethereum);
 }
 
+export const contracts = {
+  token: {
+    address: TOKEN_ADDRESS,
+    abi: tokenAbi
+  },
+  faucet: {
+    address: FAUCET_ADDRESS,
+    abi: faucetAbi
+  }
+} as const;
+
 export async function getSigner() {
   const provider = getProvider();
   return await provider.getSigner();
@@ -93,7 +100,6 @@ export async function getFaucetContractWithSigner() {
   return getFaucetContract(signer);
 }
 
-// Enhanced error parser that handles custom errors
 export function parseContractError(error: any): string {
   console.log("Raw error:", error);
   
@@ -102,15 +108,12 @@ export function parseContractError(error: any): string {
   }
   
   if (error.code === "CALL_EXCEPTION") {
-    // Check for custom errors based on error data
     const errorData = error.data;
     
     if (errorData) {
-      // Check for specific custom error signatures
-      // 0xc1ab61a1 = CooldownActive(uint256)
+
       if (errorData.startsWith("0xc1ab61a1")) {
         try {
-          // Decode the nextClaimTimestamp from the error data
           const decoded = ethers.AbiCoder.defaultAbiCoder().decode(
             ["uint256"],
             "0x" + errorData.slice(10)
@@ -130,22 +133,18 @@ export function parseContractError(error: any): string {
         return "Cooldown period is still active";
       }
       
-      // 0x1cd3f4d3 = InsufficientFaucetBalance()
       if (errorData.startsWith("0x1cd3f4d3")) {
         return "Faucet has insufficient balance";
       }
       
-      // 0x30cd7471 = NotOwner()
       if (errorData.startsWith("0x30cd7471")) {
         return "Only contract owner can perform this action";
       }
       
-      // 0x90b8ec18 = TransferFailed()
       if (errorData.startsWith("0x90b8ec18")) {
         return "Token transfer failed";
       }
       
-      // 0xd92e233d = ZeroAddress()
       if (errorData.startsWith("0xd92e233d")) {
         return "Zero address not allowed";
       }

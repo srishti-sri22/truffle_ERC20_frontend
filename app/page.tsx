@@ -92,10 +92,6 @@ export default function Home() {
         {/* Hero Section */}
         <section className="mb-20">
           <div className="text-center max-w-3xl mx-auto">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-100 text-amber-800 font-semibold mb-6">
-              <span>✨</span>
-              <span>Just Launched</span>
-            </div>
             
             <h1 className="text-4xl md:text-6xl font-bold text-amber-900 mb-6">
               Get Your Test Tokens
@@ -122,7 +118,7 @@ export default function Home() {
                 <>
                   <Link href="/faucet">
                     <button className="w-full sm:w-auto px-8 py-4 rounded-full bg-gradient-to-r from-amber-600 to-amber-700 text-white font-bold text-lg shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center gap-2">
-                      <span>💧</span>
+                      <img src="../publi" alt="" />
                       Go to Faucet
                       <span>→</span>
                     </button>
@@ -183,12 +179,12 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Features */}
+
         <div className="grid md:grid-cols-3 gap-8 mb-20">
           <div className="h-full p-8 rounded-2xl bg-amber-50 border-2 border-amber-100 shadow-md hover:shadow-lg transition-shadow duration-200">
             <div className="flex items-center gap-4 mb-6">
-              <div className="p-3 rounded-xl bg-gradient-to-r from-amber-700 to-amber-800">
-                <span className="text-white text-xl">💧</span>
+              <div className="p-3 rounded-xl">
+                <span className="text-white text-xl"><img className="h-6 w-6" src="../public/token.png" alt="" /></span>
               </div>
               <h3 className="text-2xl font-bold text-amber-900">Claim Tokens</h3>
             </div>

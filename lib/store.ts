@@ -14,7 +14,6 @@ interface TokenState {
   cooldownPeriod: number;
   isConnected: boolean;
   
-  // New state for transaction tracking
   txHash: string | null;
   isLoading: boolean;
   error: string | null;
@@ -22,7 +21,6 @@ interface TokenState {
   canClaim: boolean;
   timeRemaining: string;
   
-  // Actions
   setBalance: (balance: string) => void;
   setAllowance: (allowance: string) => void;
   setTotalSupply: (totalSupply: string) => void;
@@ -32,7 +30,6 @@ interface TokenState {
   setFaucetInfo: (claimAmount: string, balance: string, lastClaimTime: number, cooldown: number) => void;
   setConnected: (connected: boolean) => void;
   
-  // New actions
   setTxHash: (txHash: string | null) => void;
   setIsLoading: (isLoading: boolean) => void;
   setError: (error: string | null) => void;
@@ -44,7 +41,6 @@ interface TokenState {
 }
 
 export const useTokenStore = create<TokenState>((set) => ({
-  // Initial state
   balance: '0',
   allowance: '0',
   totalSupply: '0',
@@ -58,7 +54,6 @@ export const useTokenStore = create<TokenState>((set) => ({
   cooldownPeriod: 86400, 
   isConnected: false,
   
-  // New state
   txHash: null,
   isLoading: false,
   error: null,
@@ -66,7 +61,6 @@ export const useTokenStore = create<TokenState>((set) => ({
   canClaim: true,
   timeRemaining: '',
 
-  // Actions
   setBalance: (balance) => set({ balance }),
   setAllowance: (allowance) => set({ allowance }),
   setTotalSupply: (totalSupply) => set({ totalSupply }),
@@ -82,7 +76,6 @@ export const useTokenStore = create<TokenState>((set) => ({
     }),
   setConnected: (connected) => set({ isConnected: connected }),
   
-  // New actions
   setTxHash: (txHash) => set({ txHash }),
   setIsLoading: (isLoading) => set({ isLoading }),
   setError: (error) => set({ error }),
