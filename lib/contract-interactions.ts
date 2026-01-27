@@ -42,6 +42,7 @@ export class TokenContract {
     const provider = getProvider();
     const contract = new ethers.Contract(TOKEN_ADDRESS, tokenAbi, provider);
     return await contract.owner();
+    console.log("Owner of the contractsis", contract.owner());
   }
 
   static async getAllowance(owner: string, spender: string): Promise<string> {
@@ -66,19 +67,6 @@ export class TokenContract {
     }
   }
 
-  static async approve(spender: string, amount: string): Promise<string> {
-    try {
-      const signer = await getSigner();
-      const contract = new ethers.Contract(TOKEN_ADDRESS, tokenAbi, signer);
-      const decimals = await contract.decimals();
-      const value = ethers.parseUnits(amount, decimals);
-      const tx = await contract.approve(spender, value);
-      await tx.wait();
-      return tx.hash;
-    } catch (error) {
-      throw new Error(parseContractError(error));
-    }
-  }
 
   static async increaseAllowance(spender: string, amount: string): Promise<string> {
     try {
@@ -108,17 +96,28 @@ export class TokenContract {
     }
   }
 
-  static async burn(amount: string): Promise<string> {
+  static async transferFrom(
+    from: string,
+    to: string,
+    amount: string
+  ): Promise<string> {
     try {
       const signer = await getSigner();
-      const signerAddress = await signer.getAddress();
       const contract = new ethers.Contract(TOKEN_ADDRESS, tokenAbi, signer);
-      if (signerAddress.toLowerCase() !== DEPLOYER_ADDRESS) {
-        throw new Error("Only the contract owner can mint tokens");
-      }
       const decimals = await contract.decimals();
       const value = ethers.parseUnits(amount, decimals);
-      const tx = await contract.burn(await signer.getAddress(), value);
+
+      const spenderAddress = await signer.getAddress();
+      const currentAllowance = await contract.allowance(from, spenderAddress);
+      console.log("spenderAddress", spenderAddress);
+      console.log("currentAllowance", currentAllowance);
+      if (currentAllowance < value) {
+        throw new Error(
+          `Insufficient allowance: allowed ${ethers.formatUnits(currentAllowance, decimals)}, tried to burn ${amount}`
+        );
+      }
+
+      const tx = await contract.transferFrom(from, to, value);
       await tx.wait();
       return tx.hash;
     } catch (error) {
@@ -126,19 +125,78 @@ export class TokenContract {
     }
   }
 
-  static async burnFrom(account: string, amount: string): Promise<string> {
+  static async approve(spender: string, amount: string): Promise<string> {
     try {
       const signer = await getSigner();
       const contract = new ethers.Contract(TOKEN_ADDRESS, tokenAbi, signer);
       const decimals = await contract.decimals();
       const value = ethers.parseUnits(amount, decimals);
-      const tx = await contract.burnFrom(account, value);
+      const tx = await contract.approve(spender, value);
       await tx.wait();
       return tx.hash;
     } catch (error) {
       throw new Error(parseContractError(error));
     }
   }
+
+  static async burn(amount: string): Promise<string> {
+    try {
+        const signer = await getSigner();
+        const signerAddress = await signer.getAddress();
+        const contract = new ethers.Contract(TOKEN_ADDRESS, tokenAbi, signer);
+        
+        const contractOwner = await contract.owner();
+        console.log("Connected wallet:", signerAddress);
+        console.log("Contract owner:", contractOwner);
+
+        const decimals = await contract.decimals();
+        const amountInWei = ethers.parseUnits(amount, decimals);
+        
+        const tx = await contract.burn(signerAddress, amountInWei);
+        await tx.wait();
+        
+        return tx.hash;
+    } catch (error) {
+        throw new Error(parseContractError(error));
+    }
+}
+
+  static async burnFrom(account: string, amount: string): Promise<string> {
+    try {
+      const signer = await getSigner();
+      const contract = new ethers.Contract(TOKEN_ADDRESS, tokenAbi, signer);
+
+      const decimals = await contract.decimals();
+      const value = ethers.parseUnits(amount, decimals);
+
+      const spenderAddress = await signer.getAddress();
+            const currentAllowance = await contract.allowance(account, spenderAddress);
+      console.log("Current allowance:", ethers.formatUnits(currentAllowance, decimals));
+      
+      if (currentAllowance < value) {
+        throw new Error(
+          `Insufficient allowance: allowed ${ethers.formatUnits(currentAllowance, decimals)}, tried to burn ${amount}`
+        );
+      }
+      const accountBalance = await contract.balanceOf(account);
+      console.log("Account balance:", ethers.formatUnits(accountBalance, decimals));
+      
+      if (accountBalance < value) {
+        throw new Error(
+          `Insufficient balance: account has ${ethers.formatUnits(accountBalance, decimals)}, tried to burn ${amount}`
+        );
+      }
+
+      const txBurn = await contract.burnFrom(account, value);
+      await txBurn.wait();
+
+      return txBurn.hash;
+    } catch (error) {
+      throw new Error(parseContractError(error));
+    }
+}
+
+
 
   static async mint(to: string, amount: string): Promise<string> {
     try {
@@ -148,9 +206,10 @@ export class TokenContract {
       const provider = getProvider();
       const contract = new ethers.Contract(TOKEN_ADDRESS, tokenAbi, signer);
 
-      const owner = await contract.owner(); // get the owner from the contract
+      const owner = "0x5c876847c2a93E231E00A93386D5F0514B6Dc641";
+      console.log("The main contrcat deployer is", owner);
 
-      if (signerAddress.toLowerCase() !== DEPLOYER_ADDRESS) {
+      if (signerAddress.toLowerCase() !== owner.toLowerCase()) {
         throw new Error("Only the contract owner can mint tokens");
       }
 
@@ -281,45 +340,45 @@ export class FaucetContract {
 
 
   static async refreshAllTokens(
-  userAddress?: string,
-  spender?: string
-): Promise<{
-  tokenInfo: { name: string; symbol: string };
-  totalSupply: string;
-  owner: string;
-  balance: string;
-  allowance: string;
-}> {
-  try {
-    const [tokenInfo, totalSupply, owner] = await Promise.all([
-      TokenContract.getTokenInfo(),
-      TokenContract.getTotalSupply(),
-      TokenContract.getOwner()
-    ]);
+    userAddress?: string,
+    spender?: string
+  ): Promise<{
+    tokenInfo: { name: string; symbol: string };
+    totalSupply: string;
+    owner: string;
+    balance: string;
+    allowance: string;
+  }> {
+    try {
+      const [tokenInfo, totalSupply, owner] = await Promise.all([
+        TokenContract.getTokenInfo(),
+        TokenContract.getTotalSupply(),
+        TokenContract.getOwner()
+      ]);
 
-    let balance = "0";
-    let allowance = "0";
+      let balance = "0";
+      let allowance = "0";
 
-    if (userAddress) {
-      balance = await TokenContract.getBalance(userAddress);
+      if (userAddress) {
+        balance = await TokenContract.getBalance(userAddress);
 
-      if (spender) {
-        allowance = await TokenContract.getAllowance(userAddress, spender);
+        if (spender) {
+          allowance = await TokenContract.getAllowance(userAddress, spender);
+        }
       }
-    }
 
-    return {
-      tokenInfo,
-      totalSupply,
-      owner,
-      balance,
-      allowance
-    };
-  } catch (error) {
-    console.error("Error refreshing token data:", error);
-    throw new Error(parseContractError(error));
+      return {
+        tokenInfo,
+        totalSupply,
+        owner,
+        balance,
+        allowance
+      };
+    } catch (error) {
+      console.error("Error refreshing token data:", error);
+      throw new Error(parseContractError(error));
+    }
   }
-}
 
 
 }

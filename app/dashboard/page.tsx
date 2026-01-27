@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useAccount } from "wagmi";
 import { useTokenStore } from "@/lib/store";
 import { TokenContract, FaucetContract } from "@/lib/contract-interactions";
 import {
@@ -9,33 +10,38 @@ import {
     ApproveTokenCard,
     BurnTokenCard,
     MintTokenCard,
-    BurnFromTokenCard
-} from "@/components/cards/dashboard-cards";
+    BurnFromTokenCard,
+    TransferFromTokenCard,
+    OwnershipTransferCard
+} from "@/components/dashboard-cards/dashboard-cards";
 import Link from "next/link";
 
 export default function Dashboard() {
+    const { address, isConnected } = useAccount();
+    
     const {
-        userAddress,
-        isConnected,
         setBalance,
         setTotalSupply,
         setTokenInfo,
         setFaucetInfo
     } = useTokenStore();
+    
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        if (isConnected && userAddress) {
+        if (isConnected && address) {
             loadContractData();
         }
-    }, [isConnected, userAddress]);
+    }, [isConnected, address]);
 
     const loadContractData = async () => {
+        if (!address) return;
+        
         try {
             setIsLoading(true);
 
             const [balance, totalSupply, tokenInfo] = await Promise.all([
-                TokenContract.getBalance(userAddress),
+                TokenContract.getBalance(address),
                 TokenContract.getTotalSupply(),
                 TokenContract.getTokenInfo()
             ]);
@@ -48,7 +54,7 @@ export default function Dashboard() {
                 FaucetContract.getClaimAmount(),
                 FaucetContract.getFaucetBalance(),
                 FaucetContract.getCooldown(),
-                FaucetContract.getLastClaim(userAddress)
+                FaucetContract.getLastClaim(address)
             ]);
 
             setFaucetInfo(claimAmount, faucetBalance, lastClaimTime, cooldown);
@@ -60,8 +66,8 @@ export default function Dashboard() {
         }
     };
 
-    const formatAddress = (address: string) => {
-        return `${address.slice(0, 6)}...${address.slice(-4)}`;
+    const formatAddress = (addr: string) => {
+        return `${addr.slice(0, 6)}...${addr.slice(-4)}`;
     };
 
     if (!isConnected) {
@@ -75,7 +81,7 @@ export default function Dashboard() {
                     </div>
                     <h1 className="text-4xl font-bold text-amber-900 mb-4">Wallet Not Connected</h1>
                     <p className="text-lg text-amber-600 mb-8 max-w-md mx-auto">
-                        Please connect your wallet to access the dashboard and manage your tokens
+                        Please connect your wallet using the navbar above to access the dashboard
                     </p>
                     <button
                         onClick={() => window.location.href = '/'}
@@ -146,17 +152,7 @@ export default function Dashboard() {
                                 <p className="text-amber-600 text-sm mt-1">Manage your tokens and transactions</p>
                             </div>
                         </div>
-                        <div className="flex items-center gap-3">
-                            <div className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-100 to-orange-100 border-2 border-amber-200 shadow-md">
-                                <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse-slow"></div>
-                                <span className="text-amber-800 font-medium font-mono text-sm">
-                                    {formatAddress(userAddress)}
-                                </span>
-                            </div>
-                            <Link href="/" className="px-5 py-2.5 rounded-xl bg-white border-2 border-amber-300 text-amber-700 font-medium hover:bg-amber-50 hover:shadow-lg hover:scale-105 transition-all duration-300">
-                                ← Home
-                            </Link>
-                        </div>
+                       
                     </div>
                 </header>
 
@@ -171,7 +167,7 @@ export default function Dashboard() {
                                 <TransferTokenCard />
                             </div>
                             <div className="animate-fade-in-up" style={{ animationDelay: '20ms' }}>
-                                <ApproveTokenCard />
+                                <TransferFromTokenCard />
                             </div>
                             <div className="animate-fade-in-up" style={{ animationDelay: '30ms' }}>
                                 <BurnTokenCard />
@@ -179,8 +175,14 @@ export default function Dashboard() {
                             <div className="animate-fade-in-up" style={{ animationDelay: '30ms' }}>
                                 <BurnFromTokenCard />
                             </div>
+                            <div className="animate-fade-in-up" style={{ animationDelay: '20ms' }}>
+                                <ApproveTokenCard />
+                            </div>
                             <div className="animate-fade-in-up" style={{ animationDelay: '40ms' }}>
                                 <MintTokenCard />
+                            </div>
+                            <div className="animate-fade-in-up" style={{ animationDelay: '40ms' }}>
+                                <OwnershipTransferCard />
                             </div>
                         </div>
                     </div>

@@ -1,11 +1,14 @@
 "use client";
 
 import { useState } from "react";
+import { useAccount } from "wagmi";
 import { useTokenStore } from "@/lib/store";
 import { FaucetContract } from "@/lib/contract-interactions";
-import { Card } from "./dashboard-cards";
+import { Card } from "../dashboard-cards/dashboard-cards";
 
 export const ClaimFaucetCard = () => {
+  const { address } = useAccount();
+  
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -13,9 +16,9 @@ export const ClaimFaucetCard = () => {
   
   const { 
     faucetClaimAmount, 
+    faucetBalance,
     lastClaimTime, 
     cooldownPeriod, 
-    userAddress,
     setFaucetInfo,
     setTxHash: setStoreTxHash,
     setIsLoading: setStoreIsLoading,
@@ -26,6 +29,7 @@ export const ClaimFaucetCard = () => {
   } = useTokenStore();
 
   const canClaim = () => {
+    console.log(lastClaimTime);
     if (lastClaimTime === 0) return true;
     const currentTime = Math.floor(Date.now() / 1000);
     return currentTime >= lastClaimTime + cooldownPeriod;
@@ -51,7 +55,7 @@ export const ClaimFaucetCard = () => {
   };
 
   const handleClaim = async () => {
-    if (!userAddress) {
+    if (!address) {
       setError("Please connect your wallet first");
       return;
     }
@@ -98,14 +102,14 @@ export const ClaimFaucetCard = () => {
   };
 
   const refreshFaucetData = async () => {
-    if (!userAddress) return;
+    if (!address) return;
     
     try {
       const [claimAmount, faucetBalance, cooldown, lastClaimTime] = await Promise.all([
         FaucetContract.getClaimAmount(),
         FaucetContract.getFaucetBalance(),
         FaucetContract.getCooldown(),
-        FaucetContract.getLastClaim(userAddress)
+        FaucetContract.getLastClaim(address)
       ]);
       
       setFaucetInfo(claimAmount, faucetBalance, lastClaimTime, cooldown);
@@ -116,7 +120,6 @@ export const ClaimFaucetCard = () => {
     }
   };
 
-  const { faucetBalance } = useTokenStore();
   const claimStatus = canClaim();
 
   return (
@@ -277,7 +280,8 @@ export const ClaimFaucetCard = () => {
 };
 
 export const FaucetMetricsCard = () => {
-  const { faucetBalance, faucetClaimAmount, cooldownPeriod, userAddress } = useTokenStore();
+  const { address } = useAccount();
+  const { faucetBalance, faucetClaimAmount, cooldownPeriod } = useTokenStore();
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const formatTime = (seconds: number) => {
@@ -303,7 +307,7 @@ export const FaucetMetricsCard = () => {
   };
 
   const refreshFaucetData = async () => {
-    if (!userAddress) return;
+    if (!address) return;
     
     setIsRefreshing(true);
     try {

@@ -1,112 +1,20 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect } from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { useTokenStore } from "@/lib/store"
-import { wallet } from "@/lib/wallet"
-import { FaucetContract, TokenContract } from "@/lib/contract-interactions"
+import { useAccount } from "wagmi"
 
 export default function Home() {
-  const [isConnecting, setIsConnecting] = useState(false)
-  const { userAddress, isConnected, setConnected, setUserAddress } = useTokenStore()
-  const [tokenInfo, setTokenInfo] = useState<{ name: string; symbol: string }>({ name: "", symbol: "" })
-  const [faucetData, setFaucetData] = useState({
-    claimAmount: "0",
-    faucetBalance: "0",
-    cooldown: 0,
-    lastClaimTime: 0
-  })
+  const { address, isConnected } = useAccount()
 
-  const formatAddress = (address: string) => `${address.slice(0, 6)}...${address.slice(-4)}`
-
-  const handleConnect = async () => {
-    setIsConnecting(true)
-    await wallet.connect()
-    setIsConnecting(false)
-  }
-
-  const handleDisconnect = () => wallet.disconnect()
-
-  const loadTokenInfo = async () => {
-    try {
-      const info = await TokenContract.getTokenInfo()
-      setTokenInfo(info)
-    } catch { }
-  }
-
-  const loadFaucetData = async () => {
-    if (!userAddress) return
-    try {
-      const data = await FaucetContract.getFaucetData(userAddress)
-      setFaucetData(data)
-    } catch { }
-  }
-
-  useEffect(() => {
-    wallet.initListeners()
-    wallet.checkConnection()
-    loadTokenInfo()
-  }, [])
-
-  useEffect(() => {
-    if (isConnected) loadFaucetData()
-  }, [isConnected, userAddress])
+  const formatAddress = (addr: string) => `${addr.slice(0, 6)}...${addr.slice(-4)}`
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 relative overflow-hidden">
       <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0icmdiYSgyNTEsIDE5MSwgMzYsIDAuMSkiIHN0cm9rZS13aWR0aD0iMSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmlkKSIvPjwvc3ZnPg==')] opacity-40"></div>
       
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <header className="mb-12 animate-fade-in">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-            <div className="flex items-center gap-4 group">
-              <div className="p-3 rounded-2xl bg-gradient-to-br from-amber-600 to-amber-800 shadow-lg group-hover:shadow-xl group-hover:scale-105 transition-all duration-300">
-                <Image src="/faucet.svg" alt="Faucet" width={32} height={32} className="filter brightness-0 invert" />
-              </div>
-              <div>
-                <h1 className="text-3xl font-bold bg-gradient-to-r from-amber-800 to-amber-950 bg-clip-text text-transparent">
-                  Truffle Token
-                </h1>
-                <p className="text-amber-600 text-sm">Sweet tokens, always flowing</p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3">
-              {isConnected ? (
-                <div className="flex items-center gap-3 animate-slide-in-right">
-                  <div className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 shadow-sm">
-                    <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse-slow"></div>
-                    <span className="text-green-700 font-medium text-sm">{formatAddress(userAddress)}</span>
-                  </div>
-                  <button
-                    onClick={handleDisconnect}
-                    className="px-4 py-2.5 rounded-xl bg-white border border-amber-200 text-amber-700 font-medium text-sm hover:bg-amber-50 hover:border-amber-300 hover:shadow-md transition-all duration-300"
-                  >
-                    Disconnect
-                  </button>
-                </div>
-              ) : (
-                <button
-                  onClick={handleConnect}
-                  disabled={isConnecting}
-                  className="px-6 py-3 rounded-xl bg-gradient-to-r from-amber-600 to-amber-700 text-white font-semibold shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 animate-fade-in"
-                >
-                  {isConnecting ? (
-                    <span className="flex items-center gap-2">
-                      <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
-                      Connecting...
-                    </span>
-                  ) : "Connect Wallet"}
-                </button>
-              )}
-            </div>
-          </div>
-        </header>
-
         <section className="mb-20 text-center max-w-4xl mx-auto animate-fade-in-up">
           <div className="mb-8 inline-block">
             <div className="text-6xl md:text-8xl mb-4 animate-bounce-slow">🍫</div>
@@ -124,26 +32,7 @@ export default function Home() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            {!isConnected ? (
-              <button
-                onClick={handleConnect}
-                disabled={isConnecting}
-                className="group relative px-8 py-4 rounded-full bg-gradient-to-r from-amber-600 to-amber-700 text-white font-bold text-lg shadow-xl hover:shadow-2xl hover:scale-105 active:scale-95 transition-all duration-300 overflow-hidden disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
-              >
-                <span className="relative z-10 flex items-center justify-center gap-2">
-                  {isConnecting ? (
-                    <>
-                      <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
-                      Connecting...
-                    </>
-                  ) : "Connect Wallet to Start"}
-                </span>
-                <div className="absolute inset-0 bg-gradient-to-r from-amber-500 to-amber-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-              </button>
-            ) : (
+            {isConnected ? (
               <>
                 <Link href="/faucet" className="animate-slide-in-left">
                   <button className="group relative px-8 py-4 rounded-full bg-gradient-to-r from-amber-600 to-amber-700 text-white font-bold text-lg shadow-xl hover:shadow-2xl hover:scale-105 active:scale-95 transition-all duration-300 overflow-hidden">
@@ -163,6 +52,10 @@ export default function Home() {
                   </button>
                 </Link>
               </>
+            ) : (
+              <div className="text-amber-600 font-medium">
+                Connect your wallet using the button above to get started
+              </div>
             )}
           </div>
         </section>
@@ -232,20 +125,14 @@ export default function Home() {
 
         {isConnected && (
           <div className="mb-12 p-6 rounded-2xl bg-gradient-to-r from-green-50 via-emerald-50 to-green-50 border-2 border-green-200 shadow-lg animate-slide-in-up">
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <div className="flex items-center gap-3">
                 <div className="w-3 h-3 rounded-full bg-green-500 animate-pulse-slow shadow-lg shadow-green-500/50"></div>
                 <span className="text-green-700 font-semibold">Wallet Connected</span>
                 <span className="px-3 py-1 rounded-lg bg-white/70 text-green-600 text-sm font-mono border border-green-200">
-                  {formatAddress(userAddress)}
+                  {address && formatAddress(address)}
                 </span>
               </div>
-              <button
-                onClick={handleDisconnect}
-                className="px-5 py-2 text-sm rounded-xl bg-white border-2 border-green-300 text-green-700 font-medium hover:bg-green-50 hover:shadow-md transition-all duration-300"
-              >
-                Disconnect
-              </button>
             </div>
           </div>
         )}

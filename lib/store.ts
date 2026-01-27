@@ -7,14 +7,12 @@ interface TokenState {
   tokenName: string;
   tokenSymbol: string;
   owner: string;
-  userAddress: string;
 
   faucetClaimAmount: string;
   faucetBalance: string;
   lastClaimTime: number;
   cooldownPeriod: number;
 
-  isConnected: boolean;
   isLoading: boolean;
   txHash: string | null;
   error: string | null;
@@ -28,11 +26,9 @@ interface TokenState {
   setTotalSupply: (v: string) => void;
   setTokenInfo: (name: string, symbol: string) => void;
   setOwner: (v: string) => void;
-  setUserAddress: (v: string) => void;
 
   setFaucetInfo: (claimAmount: string, balance: string, lastClaim: number, cooldown: number) => void;
 
-  setConnected: (v: boolean) => void;
   setIsLoading: (v: boolean) => void;
   setTxHash: (v: string | null) => void;
   setError: (v: string | null) => void;
@@ -42,7 +38,6 @@ interface TokenState {
   setTimeRemaining: (v: string) => void;
 
   resetTxState: () => void;
-  disconnectWallet: () => void;
   resetAll: () => void;
 }
 
@@ -53,14 +48,12 @@ export const useTokenStore = create<TokenState>((set) => ({
   tokenName: "",
   tokenSymbol: "",
   owner: "",
-  userAddress: "",
 
   faucetClaimAmount: "0",
   faucetBalance: "0",
   lastClaimTime: 0,
   cooldownPeriod: 0,
 
-  isConnected: false,
   isLoading: false,
   txHash: null,
   error: null,
@@ -74,7 +67,6 @@ export const useTokenStore = create<TokenState>((set) => ({
   setTotalSupply: (v) => set({ totalSupply: v }),
   setTokenInfo: (name, symbol) => set({ tokenName: name, tokenSymbol: symbol }),
   setOwner: (v) => set({ owner: v }),
-  setUserAddress: (v) => set({ userAddress: v }),
 
   setFaucetInfo: (claimAmount, balance, lastClaim, cooldown) =>
     set({
@@ -84,7 +76,6 @@ export const useTokenStore = create<TokenState>((set) => ({
       cooldownPeriod: cooldown
     }),
 
-  setConnected: (v) => set({ isConnected: v }),
   setIsLoading: (v) => set({ isLoading: v }),
   setTxHash: (v) => set({ txHash: v }),
   setError: (v) => set({ error: v }),
@@ -101,21 +92,6 @@ export const useTokenStore = create<TokenState>((set) => ({
       success: null
     }),
 
-  disconnectWallet: () =>
-    set({
-      isConnected: false,
-      userAddress: "",
-      balance: "0",
-      allowance: "0",
-      faucetBalance: "0",
-      lastClaimTime: 0,
-      canClaim: false,
-      timeRemaining: "",
-      txHash: null,
-      error: null,
-      success: null
-    }),
-
   resetAll: () =>
     set({
       balance: "0",
@@ -124,12 +100,10 @@ export const useTokenStore = create<TokenState>((set) => ({
       tokenName: "",
       tokenSymbol: "",
       owner: "",
-      userAddress: "",
       faucetClaimAmount: "0",
       faucetBalance: "0",
       lastClaimTime: 0,
       cooldownPeriod: 0,
-      isConnected: false,
       isLoading: false,
       txHash: null,
       error: null,

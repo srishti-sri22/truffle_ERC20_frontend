@@ -3,13 +3,14 @@
 import { useState, useEffect } from "react";
 import { ethers } from "ethers";
 import Link from "next/link";
+import { useAccount } from "wagmi";
 import { useTokenStore } from "@/lib/store";
 import { FAUCET_ADDRESS, faucetAbi, getProvider } from "@/lib/contracts";
 
 export default function FaucetPage() {
+  const { address, isConnected } = useAccount();
+  
   const {
-    userAddress,
-    isConnected,
     faucetBalance,
     faucetClaimAmount,
     lastClaimTime,
@@ -29,8 +30,8 @@ export default function FaucetPage() {
     setTimeRemaining
   } = useTokenStore();
 
-  const formatAddress = (address: string) => {
-    return `${address.slice(0, 6)}...${address.slice(-4)}`;
+  const formatAddress = (addr: string) => {
+    return `${addr.slice(0, 6)}...${addr.slice(-4)}`;
   };
 
   const formatTime = (seconds: number) => {
@@ -48,40 +49,37 @@ export default function FaucetPage() {
     return `${secs}s`;
   };
 
-  // Load faucet data
   useEffect(() => {
-    if (isConnected && userAddress) {
+    if (isConnected && address) {
       loadFaucetData();
 
-      // Set up interval to update countdown
       const interval = setInterval(() => {
         updateClaimStatus();
       }, 1000);
 
       return () => clearInterval(interval);
     }
-  }, [isConnected, userAddress]);
+  }, [isConnected, address]);
 
   const loadFaucetData = async () => {
+    if (!address) return;
+    
     try {
       const provider = getProvider();
       const faucetContract = new ethers.Contract(FAUCET_ADDRESS, faucetAbi, provider);
 
-      // Load faucet info
       const [balance, amount, cooldownSecs] = await Promise.all([
         faucetContract.faucetBalance(),
         faucetContract.claimAmount(),
         faucetContract.cooldown()
       ]);
 
-      // Convert from wei (assuming 18 decimals)
       const formattedBalance = ethers.formatUnits(balance, 18);
       const formattedAmount = ethers.formatUnits(amount, 18);
 
-      // Load user's last claim time
       let lastClaimTimestamp = 0;
       try {
-        const lastClaim = await faucetContract.lastClaim(userAddress);
+        const lastClaim = await faucetContract.lastClaim(address);
         lastClaimTimestamp = Number(lastClaim);
       } catch (err) {
         console.log("No previous claim found");
@@ -121,7 +119,7 @@ export default function FaucetPage() {
   };
 
   async function claim() {
-    if (!isConnected || !userAddress) {
+    if (!isConnected || !address) {
       setError("Please connect your wallet first");
       return;
     }
@@ -140,22 +138,18 @@ export default function FaucetPage() {
       const signer = await provider.getSigner();
       const faucet = new ethers.Contract(FAUCET_ADDRESS, faucetAbi, signer);
 
-      // Estimate gas
       const gasEstimate = await faucet.claim.estimateGas();
 
-      // Send transaction
       const tx = await faucet.claim();
 
       setTxHash(tx.hash);
       setSuccess("Transaction submitted! Waiting for confirmation...");
 
-      // Wait for confirmation
       const receipt = await tx.wait();
 
       if (receipt.status === 1) {
         setSuccess(`Success! ${faucetClaimAmount} tokens claimed!`);
 
-        // Refresh faucet data
         setTimeout(() => {
           loadFaucetData();
         }, 2000);
@@ -201,17 +195,11 @@ export default function FaucetPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="text-center">
             <h1 className="text-3xl font-bold text-amber-900 mb-4">Wallet Not Connected</h1>
-            <p className="text-amber-600 mb-8">Please connect your wallet to access the faucet</p>
+            <p className="text-amber-600 mb-8">Please connect your wallet using the navbar above to access the faucet</p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link href="/" className="px-6 py-3 bg-gradient-to-r from-amber-600 to-amber-700 text-white font-semibold rounded-lg hover:shadow-lg transition-shadow text-center">
                 Go to Home
               </Link>
-              <button
-                onClick={() => window.location.href = '/'}
-                className="px-6 py-3 bg-white border-2 border-amber-200 text-amber-700 font-semibold rounded-lg hover:shadow-lg transition-shadow"
-              >
-                Connect Wallet
-              </button>
             </div>
           </div>
         </div>
@@ -237,20 +225,7 @@ export default function FaucetPage() {
                 <p className="text-amber-600 text-sm mt-1">Claim free test tokens every 24 hours</p>
               </div>
             </div>
-            <div className="flex items-center gap-3">
-              <div className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-100 to-orange-100 border-2 border-amber-200 shadow-md">
-                <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse-slow"></div>
-                <span className="text-amber-800 font-medium font-mono text-sm">
-                  {formatAddress(userAddress)}
-                </span>
-              </div>
-              <Link
-                href="/"
-                className="px-5 py-2.5 rounded-xl bg-white border-2 border-amber-300 text-amber-700 font-medium hover:bg-amber-50 hover:shadow-lg hover:scale-105 transition-all duration-300"
-              >
-                ← Home
-              </Link>
-            </div>
+            
           </div>
         </header>
 
@@ -381,7 +356,7 @@ export default function FaucetPage() {
               <div className="space-y-4">
                 {[
                   { label: "Faucet Balance", value: `${faucetBalance} Tokens`, icon: "💰" },
-                  { label: "Claim Amount", value: `${faucetClaimAmount} Tokens`, icon: "" },
+                  { label: "Claim Amount", value: `${faucetClaimAmount} Tokens`, icon: "🎁" },
                   { label: "Cooldown Period", value: `${Math.floor(cooldownPeriod / 3600)} hours`, icon: "⏱️" },
                   { label: "Claims Remaining", value: Math.floor(parseFloat(faucetBalance) / parseFloat(faucetClaimAmount)), icon: "🎯" }
                 ].map((stat, idx) => (
