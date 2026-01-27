@@ -1,4 +1,4 @@
-import { create } from 'zustand';
+import { create } from "zustand";
 
 interface TokenState {
   balance: string;
@@ -8,94 +8,133 @@ interface TokenState {
   tokenSymbol: string;
   owner: string;
   userAddress: string;
+
   faucetClaimAmount: string;
   faucetBalance: string;
   lastClaimTime: number;
   cooldownPeriod: number;
+
   isConnected: boolean;
-  
-  txHash: string | null;
   isLoading: boolean;
+  txHash: string | null;
   error: string | null;
   success: string | null;
+
   canClaim: boolean;
   timeRemaining: string;
-  
-  setBalance: (balance: string) => void;
-  setAllowance: (allowance: string) => void;
-  setTotalSupply: (totalSupply: string) => void;
+
+  setBalance: (v: string) => void;
+  setAllowance: (v: string) => void;
+  setTotalSupply: (v: string) => void;
   setTokenInfo: (name: string, symbol: string) => void;
-  setOwner: (owner: string) => void;
-  setUserAddress: (address: string) => void;
-  setFaucetInfo: (claimAmount: string, balance: string, lastClaimTime: number, cooldown: number) => void;
-  setConnected: (connected: boolean) => void;
-  
-  setTxHash: (txHash: string | null) => void;
-  setIsLoading: (isLoading: boolean) => void;
-  setError: (error: string | null) => void;
-  setSuccess: (success: string | null) => void;
-  setCanClaim: (canClaim: boolean) => void;
-  setTimeRemaining: (timeRemaining: string) => void;
-  
-  resetState: () => void;
+  setOwner: (v: string) => void;
+  setUserAddress: (v: string) => void;
+
+  setFaucetInfo: (claimAmount: string, balance: string, lastClaim: number, cooldown: number) => void;
+
+  setConnected: (v: boolean) => void;
+  setIsLoading: (v: boolean) => void;
+  setTxHash: (v: string | null) => void;
+  setError: (v: string | null) => void;
+  setSuccess: (v: string | null) => void;
+
+  setCanClaim: (v: boolean) => void;
+  setTimeRemaining: (v: string) => void;
+
+  resetTxState: () => void;
+  disconnectWallet: () => void;
+  resetAll: () => void;
 }
 
 export const useTokenStore = create<TokenState>((set) => ({
-  balance: '0',
-  allowance: '0',
-  totalSupply: '0',
-  tokenName: 'Truffle Token',
-  tokenSymbol: 'TRFL',
-  owner: '',
-  userAddress: '',
-  faucetClaimAmount: '100',
-  faucetBalance: '0',
+  balance: "0",
+  allowance: "0",
+  totalSupply: "0",
+  tokenName: "",
+  tokenSymbol: "",
+  owner: "",
+  userAddress: "",
+
+  faucetClaimAmount: "0",
+  faucetBalance: "0",
   lastClaimTime: 0,
-  cooldownPeriod: 86400, 
+  cooldownPeriod: 0,
+
   isConnected: false,
-  
-  txHash: null,
   isLoading: false,
+  txHash: null,
   error: null,
   success: null,
-  canClaim: true,
-  timeRemaining: '',
 
-  setBalance: (balance) => set({ balance }),
-  setAllowance: (allowance) => set({ allowance }),
-  setTotalSupply: (totalSupply) => set({ totalSupply }),
+  canClaim: false,
+  timeRemaining: "",
+
+  setBalance: (v) => set({ balance: v }),
+  setAllowance: (v) => set({ allowance: v }),
+  setTotalSupply: (v) => set({ totalSupply: v }),
   setTokenInfo: (name, symbol) => set({ tokenName: name, tokenSymbol: symbol }),
-  setOwner: (owner) => set({ owner }),
-  setUserAddress: (address) => set({ userAddress: address }),
-  setFaucetInfo: (claimAmount, balance, lastClaimTime, cooldown) => 
-    set({ 
-      faucetClaimAmount: claimAmount, 
-      faucetBalance: balance, 
-      lastClaimTime,
-      cooldownPeriod: cooldown 
+  setOwner: (v) => set({ owner: v }),
+  setUserAddress: (v) => set({ userAddress: v }),
+
+  setFaucetInfo: (claimAmount, balance, lastClaim, cooldown) =>
+    set({
+      faucetClaimAmount: claimAmount,
+      faucetBalance: balance,
+      lastClaimTime: lastClaim,
+      cooldownPeriod: cooldown
     }),
-  setConnected: (connected) => set({ isConnected: connected }),
-  
-  setTxHash: (txHash) => set({ txHash }),
-  setIsLoading: (isLoading) => set({ isLoading }),
-  setError: (error) => set({ error }),
-  setSuccess: (success) => set({ success }),
-  setCanClaim: (canClaim) => set({ canClaim }),
-  setTimeRemaining: (timeRemaining) => set({ timeRemaining }),
-  
-  resetState: () => set({
-    balance: '0',
-    allowance: '0',
-    totalSupply: '0',
-    userAddress: '',
-    faucetBalance: '0',
-    lastClaimTime: 0,
-    isConnected: false,
-    txHash: null,
-    isLoading: false,
-    error: null,
-    success: null,
-    canClaim: true,
-    timeRemaining: ''
-  }),
+
+  setConnected: (v) => set({ isConnected: v }),
+  setIsLoading: (v) => set({ isLoading: v }),
+  setTxHash: (v) => set({ txHash: v }),
+  setError: (v) => set({ error: v }),
+  setSuccess: (v) => set({ success: v }),
+
+  setCanClaim: (v) => set({ canClaim: v }),
+  setTimeRemaining: (v) => set({ timeRemaining: v }),
+
+  resetTxState: () =>
+    set({
+      isLoading: false,
+      txHash: null,
+      error: null,
+      success: null
+    }),
+
+  disconnectWallet: () =>
+    set({
+      isConnected: false,
+      userAddress: "",
+      balance: "0",
+      allowance: "0",
+      faucetBalance: "0",
+      lastClaimTime: 0,
+      canClaim: false,
+      timeRemaining: "",
+      txHash: null,
+      error: null,
+      success: null
+    }),
+
+  resetAll: () =>
+    set({
+      balance: "0",
+      allowance: "0",
+      totalSupply: "0",
+      tokenName: "",
+      tokenSymbol: "",
+      owner: "",
+      userAddress: "",
+      faucetClaimAmount: "0",
+      faucetBalance: "0",
+      lastClaimTime: 0,
+      cooldownPeriod: 0,
+      isConnected: false,
+      isLoading: false,
+      txHash: null,
+      error: null,
+      success: null,
+      canClaim: false,
+      timeRemaining: ""
+    })
 }));

@@ -78,11 +78,9 @@ export const ClaimFaucetCard = () => {
       setSuccess("Transaction submitted! Waiting for confirmation...");
       setStoreSuccess("Transaction submitted! Waiting for confirmation...");
       
-      // Update store with new last claim time
       const currentTime = Math.floor(Date.now() / 1000);
       setFaucetInfo(faucetClaimAmount, faucetBalance, currentTime, cooldownPeriod);
       
-      // Update claim status
       setCanClaim(false);
       setTimeRemaining(timeUntilNextClaim());
       
@@ -119,62 +117,81 @@ export const ClaimFaucetCard = () => {
   };
 
   const { faucetBalance } = useTokenStore();
+  const claimStatus = canClaim();
 
   return (
     <Card
       title="Claim from Faucet"
       description="Get free test tokens every 24 hours"
-      icon="💧"
+      icon="🍪"
     >
       <div className="space-y-6">
-        <div className="text-center">
-          <div className="text-3xl font-bold text-amber-700 mb-2">
-            {faucetClaimAmount} Tokens
+        <div className="text-center animate-bounce-slow">
+          <div className="inline-block p-5 rounded-2xl bg-gradient-to-br from-amber-100 to-orange-100 mb-3 shadow-lg">
+            <div className="text-4xl font-black bg-gradient-to-r from-amber-700 to-amber-900 bg-clip-text text-transparent">
+              {faucetClaimAmount}
+            </div>
           </div>
-          <p className="text-amber-600">Available per claim</p>
+          <p className="text-lg text-amber-600 font-medium">Tokens Available per Claim</p>
         </div>
 
-        <div className="space-y-4">
-          <div className="flex justify-between items-center">
-            <span className="text-amber-600">Status</span>
-            <span className={`font-semibold ${canClaim() ? 'text-green-600' : 'text-amber-600'}`}>
-              {canClaim() ? "Ready to Claim" : "On Cooldown"}
-            </span>
+        <div className="space-y-3">
+          <div className={`p-4 rounded-xl border-2 transition-all duration-300 ${
+            claimStatus 
+              ? 'bg-gradient-to-br from-green-50 to-emerald-50 border-green-200 shadow-md' 
+              : 'bg-gradient-to-br from-amber-50 to-orange-50 border-amber-200'
+          }`}>
+            <div className="flex items-center justify-between">
+              <span className="text-amber-700 font-medium flex items-center gap-2">
+                <span className={`text-xl ${claimStatus ? 'animate-bounce' : ''}`}>
+                  {claimStatus ? "✅" : "⏳"}
+                </span>
+                Status
+              </span>
+              <span className={`font-bold ${claimStatus ? 'text-green-600' : 'text-amber-600'}`}>
+                {claimStatus ? "Ready to Claim" : "On Cooldown"}
+              </span>
+            </div>
           </div>
           
-          <div className="flex justify-between items-center">
-            <span className="text-amber-600">Next Claim</span>
-            <span className="font-semibold text-amber-700">{timeUntilNextClaim()}</span>
+          <div className="p-4 rounded-xl bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-amber-200 hover:border-amber-300 transition-all duration-300">
+            <div className="flex items-center justify-between">
+              <span className="text-amber-700 font-medium flex items-center gap-2">
+                <span className="text-xl">⏰</span>
+                Next Claim
+              </span>
+              <span className="font-bold text-amber-700">{timeUntilNextClaim()}</span>
+            </div>
           </div>
         </div>
 
         {error && (
-          <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
-            <div className="flex items-center gap-2 text-red-700">
-              <span>⚠️</span>
-              <span className="text-sm">{error}</span>
+          <div className="p-4 bg-gradient-to-r from-red-50 to-rose-50 border-2 border-red-200 rounded-xl shadow-sm animate-shake">
+            <div className="flex items-center gap-3 text-red-700">
+              <span className="text-xl">⚠️</span>
+              <span className="text-sm font-medium">{error}</span>
             </div>
           </div>
         )}
 
         {success && (
-          <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
-            <div className="flex items-center gap-2 text-green-700">
-              <span>✅</span>
-              <span className="text-sm">{success}</span>
+          <div className="p-4 bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200 rounded-xl shadow-sm animate-slide-in-up">
+            <div className="flex items-center gap-3 text-green-700">
+              <span className="text-xl animate-bounce">✅</span>
+              <span className="text-sm font-medium">{success}</span>
             </div>
           </div>
         )}
 
         {txHash && (
-          <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
-            <div className="text-xs text-blue-600 mb-1">Transaction Hash:</div>
-            <div className="font-mono text-xs break-all">{txHash.slice(0, 32)}...</div>
+          <div className="p-4 bg-gradient-to-r from-blue-50 to-cyan-50 border-2 border-blue-200 rounded-xl shadow-sm animate-fade-in">
+            <div className="text-xs text-blue-600 mb-2 font-semibold">Transaction Hash:</div>
+            <div className="font-mono text-xs break-all text-blue-700 mb-2 bg-white/50 p-2 rounded-lg">{txHash.slice(0, 32)}...</div>
             <a 
               href={`https://sepolia.etherscan.io/tx/${txHash}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-block mt-1 text-xs text-blue-600 hover:text-blue-700"
+              className="inline-flex items-center gap-2 text-xs text-blue-600 hover:text-blue-700 font-medium hover:underline"
             >
               View on Etherscan →
             </a>
@@ -183,31 +200,78 @@ export const ClaimFaucetCard = () => {
 
         <button
           onClick={handleClaim}
-          disabled={isLoading || !canClaim()}
-          className="w-full py-3 bg-gradient-to-r from-amber-600 to-amber-700 text-white font-semibold rounded-lg hover:from-amber-700 hover:to-amber-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+          disabled={isLoading || !claimStatus}
+          className="w-full py-4 bg-gradient-to-r from-amber-600 to-amber-700 text-white font-bold text-lg rounded-xl shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 transition-all duration-300"
         >
           {isLoading ? (
             <div className="flex items-center justify-center gap-2">
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+              <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
               Processing...
             </div>
-          ) : canClaim() ? (
-            <>
-              <span>💧</span>
+          ) : claimStatus ? (
+            <span className="flex items-center justify-center gap-2">
+              <span className="text-2xl">💧</span>
               Claim {faucetClaimAmount} Tokens
-            </>
+            </span>
           ) : (
-            "On Cooldown"
+            <span className="flex items-center justify-center gap-2">
+              <span className="text-2xl">⏳</span>
+              On Cooldown
+            </span>
           )}
         </button>
 
         <button
           onClick={refreshFaucetData}
-          className="w-full py-2 bg-amber-50 text-amber-700 font-medium rounded-lg border border-amber-200 hover:bg-amber-100 transition-colors"
+          className="w-full py-3 bg-gradient-to-r from-amber-50 to-orange-50 text-amber-700 font-semibold rounded-xl border-2 border-amber-200 hover:bg-amber-100 hover:border-amber-300 hover:shadow-md transition-all duration-300"
         >
-          Refresh Data
+          <span className="flex items-center justify-center gap-2">
+            <span className="text-lg">🔄</span>
+            Refresh Data
+          </span>
         </button>
       </div>
+
+      <style jsx>{`
+        @keyframes bounce-slow {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-10px); }
+        }
+        @keyframes shake {
+          0%, 100% { transform: translateX(0); }
+          25% { transform: translateX(-5px); }
+          75% { transform: translateX(5px); }
+        }
+        @keyframes slide-in-up {
+          from {
+            opacity: 0;
+            transform: translateY(30px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        @keyframes fade-in {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        .animate-bounce-slow {
+          animation: bounce-slow 3s ease-in-out infinite;
+        }
+        .animate-shake {
+          animation: shake 0.5s ease-in-out;
+        }
+        .animate-slide-in-up {
+          animation: slide-in-up 0.6s ease-out;
+        }
+        .animate-fade-in {
+          animation: fade-in 0.6s ease-out;
+        }
+      `}</style>
     </Card>
   );
 };
@@ -243,8 +307,6 @@ export const FaucetMetricsCard = () => {
     
     setIsRefreshing(true);
     try {
-      // This would be implemented in the FaucetContract class
-      // For now, we'll simulate the refresh
       await new Promise(resolve => setTimeout(resolve, 500));
     } catch (error) {
       console.error("Error refreshing data:", error);
@@ -260,44 +322,52 @@ export const FaucetMetricsCard = () => {
       icon="📈"
     >
       <div className="space-y-4">
-        <div className="flex justify-between items-center">
-          <span className="text-amber-600">Faucet Balance</span>
-          <span className="font-bold text-lg text-amber-700">
-            {parseFloat(faucetBalance).toLocaleString()} Tokens
-          </span>
-        </div>
+        {[
+          { label: "Faucet Balance", value: `${parseFloat(faucetBalance).toLocaleString()} Tokens`, icon: "💰", highlight: true },
+          { label: "Claim Amount", value: `${parseFloat(faucetClaimAmount).toLocaleString()} Tokens`, icon: "💧" },
+          { label: "Cooldown Period", value: formatTime(cooldownPeriod), icon: "⏱️" },
+          { label: "Claims Remaining", value: calculateClaimsRemaining(), icon: "🎯" }
+        ].map((metric, idx) => (
+          <div 
+            key={idx}
+            className={`p-4 rounded-xl transition-all duration-300 ${
+              metric.highlight
+                ? 'bg-gradient-to-r from-amber-100 to-orange-100 border-2 border-amber-300 shadow-md'
+                : 'bg-amber-50 hover:bg-amber-100'
+            }`}
+          >
+            <div className="flex items-center justify-between">
+              <span className="text-amber-700 font-medium flex items-center gap-2">
+                <span className="text-lg">{metric.icon}</span>
+                {metric.label}
+              </span>
+              <span className={`font-bold ${metric.highlight ? 'text-lg text-amber-900' : 'text-amber-900'}`}>
+                {metric.value}
+              </span>
+            </div>
+          </div>
+        ))}
         
-        <div className="flex justify-between items-center">
-          <span className="text-amber-600">Claim Amount</span>
-          <span className="font-semibold text-amber-900">
-            {parseFloat(faucetClaimAmount).toLocaleString()} Tokens
-          </span>
-        </div>
-        
-        <div className="flex justify-between items-center">
-          <span className="text-amber-600">Cooldown Period</span>
-          <span className="font-semibold text-amber-900">{formatTime(cooldownPeriod)}</span>
-        </div>
-        
-        <div className="flex justify-between items-center">
-          <span className="text-amber-600">Claims Remaining</span>
-          <span className="font-semibold text-amber-900">
-            {calculateClaimsRemaining()}
-          </span>
-        </div>
-        
-        <div className="pt-4">
+        <div className="pt-2">
           <button
             onClick={refreshFaucetData}
             disabled={isRefreshing}
-            className="w-full py-2 bg-amber-50 text-amber-700 font-medium rounded-lg border border-amber-200 hover:bg-amber-100 disabled:opacity-50 transition-colors"
+            className="w-full py-3 bg-gradient-to-r from-amber-600 to-amber-700 text-white font-semibold rounded-xl shadow-md hover:shadow-lg hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 transition-all duration-300"
           >
             {isRefreshing ? (
               <div className="flex items-center justify-center gap-2">
-                <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-amber-700"></div>
+                <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
                 Refreshing...
               </div>
-            ) : "Refresh Metrics"}
+            ) : (
+              <span className="flex items-center justify-center gap-2">
+                <span className="text-lg">🔄</span>
+                Refresh Metrics
+              </span>
+            )}
           </button>
         </div>
       </div>
@@ -313,65 +383,76 @@ export const FaucetInfoCard = () => {
     return `${hours} hours`;
   };
 
+  const steps = [
+    { 
+      num: "1", 
+      title: "Connect Wallet", 
+      desc: "Make sure your Web3 wallet is connected",
+      icon: "🔗"
+    },
+    { 
+      num: "2", 
+      title: "Check Cooldown", 
+      desc: `Wait ${formatCooldown(cooldownPeriod)} between claims`,
+      icon: "⏰"
+    },
+    { 
+      num: "3", 
+      title: "Claim Tokens", 
+      desc: `Get ${faucetClaimAmount} tokens per claim`,
+      icon: "🍪"
+    },
+    { 
+      num: "4", 
+      title: "Use Tokens", 
+      desc: "Test dApps, transfer, or manage in dashboard",
+      icon: "🚀"
+    }
+  ];
+
   return (
     <Card
       title="How it Works"
       description="Learn about our token faucet"
-      icon="ℹ️"
+      icon="📖"
     >
       <div className="space-y-4">
-        <div className="flex items-start gap-3">
-          <div className="p-1 rounded bg-amber-100 mt-0.5">
-            <span className="text-amber-700 text-sm">1</span>
+        {steps.map((step, idx) => (
+          <div 
+            key={idx}
+            className="flex items-start gap-4 p-3 rounded-xl hover:bg-amber-50 transition-all duration-300 group"
+          >
+            <div className="flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-xl bg-gradient-to-br from-amber-600 to-amber-700 text-white font-bold shadow-md group-hover:scale-110 transition-transform duration-300">
+              {step.num}
+            </div>
+            <div className="flex-grow">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-lg">{step.icon}</span>
+                <h4 className="font-semibold text-amber-900">{step.title}</h4>
+              </div>
+              <p className="text-sm text-amber-600">{step.desc}</p>
+            </div>
           </div>
-          <div>
-            <h4 className="font-medium text-amber-900">Connect Wallet</h4>
-            <p className="text-sm text-amber-600">Make sure your Web3 wallet is connected</p>
-          </div>
-        </div>
+        ))}
         
-        <div className="flex items-start gap-3">
-          <div className="p-1 rounded bg-amber-100 mt-0.5">
-            <span className="text-amber-700 text-sm">2</span>
+        <div className="pt-4 mt-4 border-t-2 border-amber-100">
+          <div className="flex items-center gap-2 mb-3">
+            <span className="text-xl">⚠️</span>
+            <h4 className="font-semibold text-amber-900">Important Notes</h4>
           </div>
-          <div>
-            <h4 className="font-medium text-amber-900">Check Cooldown</h4>
-            <p className="text-sm text-amber-600">
-              Wait {formatCooldown(cooldownPeriod)} between claims
-            </p>
+          <div className="space-y-2">
+            {[
+              "These are test tokens for development only",
+              "Tokens have no monetary value",
+              "Use on Sepolia testnet only",
+              "Keep your wallet secure"
+            ].map((note, idx) => (
+              <div key={idx} className="flex items-start gap-2 text-sm text-amber-600">
+                <span className="text-amber-400 mt-0.5">•</span>
+                <span>{note}</span>
+              </div>
+            ))}
           </div>
-        </div>
-        
-        <div className="flex items-start gap-3">
-          <div className="p-1 rounded bg-amber-100 mt-0.5">
-            <span className="text-amber-700 text-sm">3</span>
-          </div>
-          <div>
-            <h4 className="font-medium text-amber-900">Claim Tokens</h4>
-            <p className="text-sm text-amber-600">
-              Get {faucetClaimAmount} tokens per claim
-            </p>
-          </div>
-        </div>
-        
-        <div className="flex items-start gap-3">
-          <div className="p-1 rounded bg-amber-100 mt-0.5">
-            <span className="text-amber-700 text-sm">4</span>
-          </div>
-          <div>
-            <h4 className="font-medium text-amber-900">Use Tokens</h4>
-            <p className="text-sm text-amber-600">Test dApps, transfer, or manage in dashboard</p>
-          </div>
-        </div>
-        
-        <div className="pt-4 border-t border-amber-100">
-          <h4 className="font-medium text-amber-900 mb-2">Important Notes</h4>
-          <ul className="text-sm text-amber-500 space-y-1">
-            <li>• These are test tokens for development only</li>
-            <li>• Tokens have no monetary value</li>
-            <li>• Use on Sepolia testnet only</li>
-            <li>• Keep your wallet secure</li>
-          </ul>
         </div>
       </div>
     </Card>

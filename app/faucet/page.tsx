@@ -204,123 +204,149 @@ export default function FaucetPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
-        <header className="mb-8">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-            <div>
-              <div className="flex items-center gap-3 mb-2">
-                
-                <h1 className="text-3xl font-bold text-amber-900">Token Faucet</h1>
+    <main className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 relative overflow-hidden">
+      <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0icmdiYSgyNTEsIDE5MSwgMzYsIDAuMSkiIHN0cm9rZS13aWR0aD0iMSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmlkKSIvPjwvc3ZnPg==')] opacity-40"></div>
+      
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <header className="mb-8 animate-fade-in">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+            <div className="flex items-center gap-4">
+              <div className="p-3 rounded-2xl bg-gradient-to-br from-amber-600 to-amber-800 shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300">
+                <span className="text-3xl">🍪</span>
               </div>
-              <p className="text-amber-600">Claim free test tokens every 24 hours</p>
+              <div>
+                <h1 className="text-4xl font-bold bg-gradient-to-r from-amber-800 to-amber-950 bg-clip-text text-transparent">
+                  Token Faucet
+                </h1>
+                <p className="text-amber-600 text-sm mt-1">Claim free test tokens every 24 hours</p>
+              </div>
             </div>
-            <div className="mt-4 md:mt-0">
-              <div className="flex items-center gap-3">
-                <div className="px-4 py-2 rounded-lg bg-amber-100 border border-amber-200">
-                  <span className="text-amber-700 font-medium">
-                    {formatAddress(userAddress)}
-                  </span>
-                </div>
-                <Link
-                  href="/"
-                  className="px-4 py-2 rounded-lg bg-white border border-amber-300 text-amber-700 font-medium hover:bg-amber-50 transition-colors"
-                >
-                  Back to Home
-                </Link>
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-100 to-orange-100 border-2 border-amber-200 shadow-md">
+                <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse-slow"></div>
+                <span className="text-amber-800 font-medium font-mono text-sm">
+                  {formatAddress(userAddress)}
+                </span>
               </div>
+              <Link
+                href="/"
+                className="px-5 py-2.5 rounded-xl bg-white border-2 border-amber-300 text-amber-700 font-medium hover:bg-amber-50 hover:shadow-lg hover:scale-105 transition-all duration-300"
+              >
+                ← Home
+              </Link>
             </div>
           </div>
         </header>
 
-        {/* Main Content */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-          {/* Claim Card */}
-          <div className="lg:col-span-2">
-            <div className="bg-white rounded-xl shadow-lg border border-amber-100 overflow-hidden">
-              <div className="p-6 border-b border-amber-50">
+          <div className="lg:col-span-2 animate-slide-in-left">
+            <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl border-2 border-amber-100 overflow-hidden hover:shadow-2xl transition-all duration-300">
+              <div className="p-6 bg-gradient-to-r from-amber-50 to-orange-50 border-b-2 border-amber-100">
                 <div className="flex items-center gap-3 mb-2">
-                  <div className="p-2 rounded-lg bg-gradient-to-r from-amber-100 to-orange-100">
-                    <span className="text-amber-700 text-xl">💧</span>
+                  <div className="p-3 rounded-xl bg-gradient-to-br from-amber-600 to-amber-700 shadow-md">
+                    <span className="text-white text-2xl">🍩</span>
                   </div>
-                  <h3 className="text-xl font-bold text-amber-900">Claim Tokens</h3>
+                  <div>
+                    <h3 className="text-2xl font-bold text-amber-900">Claim Tokens</h3>
+                    <p className="text-amber-600 text-sm">Get your free test tokens from the faucet</p>
+                  </div>
                 </div>
-                <p className="text-amber-600 text-sm">Get your free test tokens from the faucet</p>
               </div>
               
-              <div className="p-6">
-                <div className="text-center mb-8">
-                  <div className="text-4xl font-bold text-amber-700 mb-2">
-                    {faucetClaimAmount} Tokens
+              <div className="p-8">
+                <div className="text-center mb-8 animate-bounce-slow">
+                  <div className="inline-block p-6 rounded-3xl bg-gradient-to-br from-amber-100 to-orange-100 mb-4 shadow-lg">
+                    <div className="text-5xl font-black bg-gradient-to-r from-amber-700 to-amber-900 bg-clip-text text-transparent">
+                      {faucetClaimAmount}
+                    </div>
                   </div>
-                  <p className="text-amber-600">Available per claim</p>
+                  <p className="text-lg text-amber-600 font-medium">Tokens Available per Claim</p>
                 </div>
 
                 <div className="space-y-6">
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="bg-amber-50 p-4 rounded-lg">
-                      <div className="text-sm text-amber-600 mb-1">Status</div>
-                      <div className={`font-semibold ${canClaim ? 'text-green-600' : 'text-amber-600'}`}>
+                    <div className={`group p-5 rounded-xl border-2 transition-all duration-300 ${
+                      canClaim 
+                        ? 'bg-gradient-to-br from-green-50 to-emerald-50 border-green-200 hover:border-green-300 hover:shadow-lg' 
+                        : 'bg-gradient-to-br from-amber-50 to-orange-50 border-amber-200 hover:border-amber-300 hover:shadow-lg'
+                    }`}>
+                      <div className="text-sm text-amber-600 mb-2 font-medium">Status</div>
+                      <div className={`font-bold text-lg flex items-center gap-2 ${canClaim ? 'text-green-600' : 'text-amber-600'}`}>
+                        <span className={`text-2xl ${canClaim ? 'animate-bounce' : ''}`}>
+                          {canClaim ? "✅" : "⏳"}
+                        </span>
                         {canClaim ? "Ready to Claim" : "On Cooldown"}
                       </div>
                     </div>
                     
-                    <div className="bg-amber-50 p-4 rounded-lg">
-                      <div className="text-sm text-amber-600 mb-1">Next Claim In</div>
-                      <div className="font-semibold text-amber-700">{timeRemaining}</div>
+                    <div className="group p-5 rounded-xl bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-amber-200 hover:border-amber-300 hover:shadow-lg transition-all duration-300">
+                      <div className="text-sm text-amber-600 mb-2 font-medium">Next Claim In</div>
+                      <div className="font-bold text-lg text-amber-700 flex items-center gap-2">
+                        <span className="text-2xl">⏰</span>
+                        {timeRemaining}
+                      </div>
                     </div>
                   </div>
 
                   <button
                     onClick={claim}
                     disabled={isLoading || !canClaim}
-                    className="w-full py-4 bg-gradient-to-r from-amber-600 to-amber-700 text-white font-bold text-lg rounded-lg hover:from-amber-700 hover:to-amber-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
+                    className="group relative w-full py-5 bg-gradient-to-r from-amber-600 to-amber-700 text-white font-bold text-lg rounded-xl shadow-xl hover:shadow-2xl hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 transition-all duration-300 overflow-hidden"
                   >
-                    {isLoading ? (
-                      <>
-                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                        Processing...
-                      </>
-                    ) : canClaim ? (
-                      <>
-                        <span>💧</span>
-                        Claim {faucetClaimAmount} Tokens
-                      </>
-                    ) : (
-                      "On Cooldown"
-                    )}
+                    <span className="relative z-10 flex items-center justify-center gap-3">
+                      {isLoading ? (
+                        <>
+                          <svg className="animate-spin h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                          </svg>
+                          Processing...
+                        </>
+                      ) : canClaim ? (
+                        <>
+                          <span className="text-2xl group-hover:scale-110 transition-transform duration-300">💧</span>
+                          Claim {faucetClaimAmount} Tokens
+                        </>
+                      ) : (
+                        <>
+                          <span className="text-2xl">⏳</span>
+                          On Cooldown
+                        </>
+                      )}
+                    </span>
+                    <div className="absolute inset-0 bg-gradient-to-r from-amber-500 to-amber-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                   </button>
 
                   {error && (
-                    <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-                      <div className="flex items-center gap-2 text-red-700">
-                        <span>⚠️</span>
-                        <span>{error}</span>
+                    <div className="p-5 bg-gradient-to-r from-red-50 to-rose-50 border-2 border-red-200 rounded-xl shadow-md animate-shake">
+                      <div className="flex items-center gap-3 text-red-700">
+                        <span className="text-2xl">⚠️</span>
+                        <span className="font-medium">{error}</span>
                       </div>
                     </div>
                   )}
 
                   {success && (
-                    <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
-                      <div className="flex items-center gap-2 text-green-700">
-                        <span>✅</span>
-                        <span>{success}</span>
+                    <div className="p-5 bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200 rounded-xl shadow-md animate-slide-in-up">
+                      <div className="flex items-center gap-3 text-green-700">
+                        <span className="text-2xl animate-bounce">✅</span>
+                        <span className="font-medium">{success}</span>
                       </div>
                     </div>
                   )}
 
                   {txHash && (
-                    <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                      <div className="text-sm text-blue-600 mb-1">Transaction Hash:</div>
-                      <div className="font-mono text-sm break-all">{txHash}</div>
+                    <div className="p-5 bg-gradient-to-r from-blue-50 to-cyan-50 border-2 border-blue-200 rounded-xl shadow-md animate-fade-in-up">
+                      <div className="text-sm text-blue-600 mb-2 font-semibold">Transaction Hash:</div>
+                      <div className="font-mono text-sm break-all text-blue-700 mb-3 bg-white/50 p-3 rounded-lg">{txHash}</div>
                       <a 
                         href={`https://sepolia.etherscan.io/tx/${txHash}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-block mt-2 text-sm text-blue-600 hover:text-blue-700"
+                        className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 hover:scale-105 transition-all duration-300 shadow-md"
                       >
-                        View on Etherscan →
+                        View on Etherscan
+                        <span>→</span>
                       </a>
                     </div>
                   )}
@@ -329,108 +355,186 @@ export default function FaucetPage() {
             </div>
           </div>
 
-          {/* Info Column */}
-          <div className="space-y-6">
-            {/* Faucet Stats */}
-            <div className="bg-white rounded-xl shadow-lg border border-amber-100 p-6">
-              <h3 className="text-lg font-semibold text-amber-900 mb-4">Faucet Stats</h3>
+          <div className="space-y-6 animate-slide-in-right">
+            <div className="group bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg border-2 border-amber-100 p-6 hover:shadow-xl hover:border-amber-300 transition-all duration-300">
+              <div className="flex items-center gap-3 mb-5">
+                <div className="p-2 rounded-xl bg-gradient-to-br from-amber-600 to-amber-700 shadow-md">
+                  <span className="text-xl">📊</span>
+                </div>
+                <h3 className="text-xl font-bold text-amber-900">Faucet Stats</h3>
+              </div>
               <div className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <span className="text-amber-600">Faucet Balance</span>
-                  <span className="font-bold text-amber-700">{faucetBalance} Tokens</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-amber-600">Claim Amount</span>
-                  <span className="font-semibold text-amber-900">{faucetClaimAmount} Tokens</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-amber-600">Cooldown Period</span>
-                  <span className="font-semibold text-amber-900">{Math.floor(cooldownPeriod / 3600)} hours</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-amber-600">Claims Remaining</span>
-                  <span className="font-semibold text-amber-900">
-                    {Math.floor(parseFloat(faucetBalance) / parseFloat(faucetClaimAmount))}
-                  </span>
-                </div>
+                {[
+                  { label: "Faucet Balance", value: `${faucetBalance} Tokens`, icon: "💰" },
+                  { label: "Claim Amount", value: `${faucetClaimAmount} Tokens`, icon: "" },
+                  { label: "Cooldown Period", value: `${Math.floor(cooldownPeriod / 3600)} hours`, icon: "⏱️" },
+                  { label: "Claims Remaining", value: Math.floor(parseFloat(faucetBalance) / parseFloat(faucetClaimAmount)), icon: "🎯" }
+                ].map((stat, idx) => (
+                  <div key={idx} className="flex items-center justify-between p-3 rounded-xl bg-amber-50 hover:bg-amber-100 transition-colors duration-300">
+                    <span className="text-amber-600 font-medium flex items-center gap-2">
+                      <span>{stat.icon}</span>
+                      {stat.label}
+                    </span>
+                    <span className="font-bold text-amber-900">{stat.value}</span>
+                  </div>
+                ))}
               </div>
             </div>
 
-            {/* How it Works */}
-            <div className="bg-white rounded-xl shadow-lg border border-amber-100 p-6">
-              <h3 className="text-lg font-semibold text-amber-900 mb-4">How it Works</h3>
-              <div className="space-y-3">
-                <div className="flex items-start gap-3">
-                  <div className="p-1 rounded bg-amber-100 mt-0.5">
-                    <span className="text-amber-700 text-sm">1</span>
-                  </div>
-                  <div>
-                    <h4 className="font-medium text-amber-900">Connect Wallet</h4>
-                    <p className="text-sm text-amber-600">Make sure your wallet is connected</p>
-                  </div>
+            <div className="group bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg border-2 border-amber-100 p-6 hover:shadow-xl hover:border-amber-300 transition-all duration-300">
+              <div className="flex items-center gap-3 mb-5">
+                <div className="p-2 rounded-xl bg-gradient-to-br from-amber-700 to-amber-800 shadow-md">
+                  <span className="text-xl">📖</span>
                 </div>
-                
-                <div className="flex items-start gap-3">
-                  <div className="p-1 rounded bg-amber-100 mt-0.5">
-                    <span className="text-amber-700 text-sm">2</span>
+                <h3 className="text-xl font-bold text-amber-900">How it Works</h3>
+              </div>
+              <div className="space-y-4">
+                {[
+                  { num: "1", title: "Connect Wallet", desc: "Make sure your wallet is connected" },
+                  { num: "2", title: "Check Cooldown", desc: "Wait 24 hours between claims" },
+                  { num: "3", title: "Claim Tokens", desc: `Get ${faucetClaimAmount} tokens per claim` }
+                ].map((step, idx) => (
+                  <div key={idx} className="flex items-start gap-4 p-3 rounded-xl hover:bg-amber-50 transition-colors duration-300">
+                    <div className="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-lg bg-gradient-to-br from-amber-600 to-amber-700 text-white font-bold shadow-md">
+                      {step.num}
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-amber-900 mb-1">{step.title}</h4>
+                      <p className="text-sm text-amber-600">{step.desc}</p>
+                    </div>
                   </div>
-                  <div>
-                    <h4 className="font-medium text-amber-900">Check Cooldown</h4>
-                    <p className="text-sm text-amber-600">Wait 24 hours between claims</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start gap-3">
-                  <div className="p-1 rounded bg-amber-100 mt-0.5">
-                    <span className="text-amber-700 text-sm">3</span>
-                  </div>
-                  <div>
-                    <h4 className="font-medium text-amber-900">Claim Tokens</h4>
-                    <p className="text-sm text-amber-600">Get {faucetClaimAmount} tokens per claim</p>
-                  </div>
-                </div>
+                ))}
               </div>
               
-              <div className="mt-6 pt-6 border-t border-amber-100">
-                <p className="text-sm text-amber-500">
-                  <span className="font-medium">Note:</span> These are test tokens for development purposes only.
-                  They have no monetary value.
-                </p>
+              <div className="mt-6 pt-6 border-t-2 border-amber-100">
+                <div className="flex items-start gap-3 p-3 bg-amber-50 rounded-xl">
+                  <span className="text-xl">ℹ️</span>
+                  <p className="text-sm text-amber-600">
+                    <span className="font-semibold text-amber-700">Note:</span> These are test tokens for development purposes only. They have no monetary value.
+                  </p>
+                </div>
               </div>
             </div>
 
-            {/* Quick Links */}
-            <div className="bg-amber-50 rounded-xl border border-amber-200 p-6">
-              <h3 className="text-lg font-semibold text-amber-900 mb-4">Quick Links</h3>
+            <div className="group bg-gradient-to-br from-amber-100 to-orange-100 rounded-2xl border-2 border-amber-200 p-6 shadow-lg hover:shadow-xl transition-all duration-300">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-2 rounded-xl bg-white shadow-md">
+                  <span className="text-xl">🔗</span>
+                </div>
+                <h3 className="text-xl font-bold text-amber-900">Quick Links</h3>
+              </div>
               <div className="space-y-3">
                 <Link 
                   href="/dashboard" 
-                  className="flex items-center justify-between p-3 bg-white rounded-lg border border-amber-100 hover:border-amber-300 transition-colors"
+                  className="flex items-center justify-between p-4 bg-white rounded-xl border-2 border-amber-200 hover:border-amber-400 hover:shadow-md hover:scale-105 transition-all duration-300"
                 >
-                  <span className="text-amber-700 font-medium">📊 Dashboard</span>
-                  <span className="text-amber-500">→</span>
+                  <span className="text-amber-800 font-semibold flex items-center gap-2">
+                    <span>📊</span>
+                    Dashboard
+                  </span>
+                  <span className="text-amber-500 text-xl">→</span>
                 </Link>
                 <button 
                   onClick={loadFaucetData}
-                  className="w-full flex items-center justify-between p-3 bg-white rounded-lg border border-amber-100 hover:border-amber-300 transition-colors"
+                  className="w-full flex items-center justify-between p-4 bg-white rounded-xl border-2 border-amber-200 hover:border-amber-400 hover:shadow-md hover:scale-105 transition-all duration-300"
                 >
-                  <span className="text-amber-700 font-medium">🔄 Refresh Data</span>
-                  <span className="text-amber-500">↻</span>
+                  <span className="text-amber-800 font-semibold flex items-center gap-2">
+                    <span>🔄</span>
+                    Refresh Data
+                  </span>
+                  <span className="text-amber-500 text-xl">↻</span>
                 </button>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Transaction History Placeholder */}
-        <div className="bg-white rounded-xl shadow-md border border-amber-100 p-6">
-          <h3 className="text-lg font-semibold text-amber-900 mb-4">Recent Claims</h3>
-          <div className="text-center py-8">
-            <p className="text-amber-500">No recent claims found</p>
-            <p className="text-sm text-amber-400 mt-2">Your claim history will appear here</p>
-          </div>
-        </div>
       </div>
+
+      <style jsx>{`
+        @keyframes fade-in {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        @keyframes fade-in-up {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        @keyframes slide-in-left {
+          from {
+            opacity: 0;
+            transform: translateX(-30px);
+          }
+          to {
+            opacity: 1;
+            transform: translateX(0);
+          }
+        }
+        @keyframes slide-in-right {
+          from {
+            opacity: 0;
+            transform: translateX(30px);
+          }
+          to {
+            opacity: 1;
+            transform: translateX(0);
+          }
+        }
+        @keyframes slide-in-up {
+          from {
+            opacity: 0;
+            transform: translateY(30px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        @keyframes bounce-slow {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-10px); }
+        }
+        @keyframes pulse-slow {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.5; }
+        }
+        @keyframes shake {
+          0%, 100% { transform: translateX(0); }
+          25% { transform: translateX(-5px); }
+          75% { transform: translateX(5px); }
+        }
+        .animate-fade-in {
+          animation: fade-in 0.6s ease-out;
+        }
+        .animate-fade-in-up {
+          animation: fade-in-up 0.6s ease-out;
+          animation-fill-mode: both;
+        }
+        .animate-slide-in-left {
+          animation: slide-in-left 0.6s ease-out;
+        }
+        .animate-slide-in-right {
+          animation: slide-in-right 0.6s ease-out;
+        }
+        .animate-slide-in-up {
+          animation: slide-in-up 0.6s ease-out;
+        }
+        .animate-bounce-slow {
+          animation: bounce-slow 3s ease-in-out infinite;
+        }
+        .animate-pulse-slow {
+          animation: pulse-slow 2s ease-in-out infinite;
+        }
+        .animate-shake {
+          animation: shake 0.5s ease-in-out;
+        }
+      `}</style>
     </main>
   );
 }
