@@ -18,14 +18,14 @@ import Link from "next/link";
 
 export default function Dashboard() {
     const { address, isConnected } = useAccount();
-    
+
     const {
         setBalance,
         setTotalSupply,
         setTokenInfo,
         setFaucetInfo
     } = useTokenStore();
-    
+
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
@@ -36,7 +36,7 @@ export default function Dashboard() {
 
     const loadContractData = async () => {
         if (!address) return;
-        
+
         try {
             setIsLoading(true);
 
@@ -72,49 +72,18 @@ export default function Dashboard() {
 
     if (!isConnected) {
         return (
-            <main className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 relative overflow-hidden flex items-center justify-center">
-                <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0icmdiYSgyNTEsIDE5MSwgMzYsIDAuMSkiIHN0cm9rZS13aWR0aD0iMSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmlkKSIvPjwvc3ZnPg==')] opacity-40"></div>
-
-                <div className="relative text-center animate-fade-in-up">
-                    <div className="mb-6 inline-block p-6 rounded-3xl bg-gradient-to-br from-amber-100 to-orange-100 shadow-xl animate-bounce-slow">
-                        <span className="text-6xl">🔒</span>
+            <main className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+                    <div className="text-center">
+                        <h1 className="text-3xl font-bold text-amber-900 mb-4">Wallet Not Connected</h1>
+                        <p className="text-amber-600 mb-8">Please connect your wallet using the navbar above to access the faucet</p>
+                        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                            <Link href="/" className="px-6 py-3 bg-gradient-to-r from-amber-600 to-amber-700 text-white font-semibold rounded-lg hover:shadow-lg transition-shadow text-center">
+                                Go to Home
+                            </Link>
+                        </div>
                     </div>
-                    <h1 className="text-4xl font-bold text-amber-900 mb-4">Wallet Not Connected</h1>
-                    <p className="text-lg text-amber-600 mb-8 max-w-md mx-auto">
-                        Please connect your wallet using the navbar above to access the dashboard
-                    </p>
-                    <button
-                        onClick={() => window.location.href = '/'}
-                        className="group px-8 py-4 bg-gradient-to-r from-amber-600 to-amber-700 text-white font-semibold rounded-xl shadow-xl hover:shadow-2xl hover:scale-105 active:scale-95 transition-all duration-300"
-                    >
-                        <span className="flex items-center gap-2">
-                            ← Go to Home
-                        </span>
-                    </button>
                 </div>
-
-                <style jsx>{`
-                    @keyframes fade-in-up {
-                        from {
-                            opacity: 0;
-                            transform: translateY(20px);
-                        }
-                        to {
-                            opacity: 1;
-                            transform: translateY(0);
-                        }
-                    }
-                    @keyframes bounce-slow {
-                        0%, 100% { transform: translateY(0); }
-                        50% { transform: translateY(-10px); }
-                    }
-                    .animate-fade-in-up {
-                        animation: fade-in-up 0.6s ease-out;
-                    }
-                    .animate-bounce-slow {
-                        animation: bounce-slow 3s ease-in-out infinite;
-                    }
-                `}</style>
             </main>
         );
     }
@@ -152,7 +121,7 @@ export default function Dashboard() {
                                 <p className="text-amber-600 text-sm mt-1">Manage your tokens and transactions</p>
                             </div>
                         </div>
-                       
+
                     </div>
                 </header>
 
