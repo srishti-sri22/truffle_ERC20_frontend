@@ -7,8 +7,8 @@ import { useTokenStore } from "@/lib/store";
 import { FAUCET_ADDRESS, faucetAbi, getProvider } from "@/lib/contracts";
 
 export default function FaucetPage() {
-  const { 
-    userAddress, 
+  const {
+    userAddress,
     isConnected,
     faucetBalance,
     faucetClaimAmount,
@@ -35,11 +35,11 @@ export default function FaucetPage() {
 
   const formatTime = (seconds: number) => {
     if (seconds <= 0) return "Now";
-    
+
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
     const secs = seconds % 60;
-    
+
     if (hours > 0) {
       return `${hours}h ${minutes}m`;
     } else if (minutes > 0) {
@@ -52,12 +52,12 @@ export default function FaucetPage() {
   useEffect(() => {
     if (isConnected && userAddress) {
       loadFaucetData();
-      
+
       // Set up interval to update countdown
       const interval = setInterval(() => {
         updateClaimStatus();
       }, 1000);
-      
+
       return () => clearInterval(interval);
     }
   }, [isConnected, userAddress]);
@@ -66,7 +66,7 @@ export default function FaucetPage() {
     try {
       const provider = getProvider();
       const faucetContract = new ethers.Contract(FAUCET_ADDRESS, faucetAbi, provider);
-      
+
       // Load faucet info
       const [balance, amount, cooldownSecs] = await Promise.all([
         faucetContract.faucetBalance(),
@@ -89,7 +89,7 @@ export default function FaucetPage() {
 
       setFaucetInfo(formattedAmount, formattedBalance, lastClaimTimestamp, Number(cooldownSecs));
       updateClaimStatus(lastClaimTimestamp, Number(cooldownSecs));
-      
+
     } catch (err) {
       console.error("Error loading faucet data:", err);
       setError("Failed to load faucet data");
@@ -99,18 +99,18 @@ export default function FaucetPage() {
   const updateClaimStatus = (customLastClaim?: number, customCooldown?: number) => {
     const currentLastClaim = customLastClaim !== undefined ? customLastClaim : lastClaimTime;
     const currentCooldown = customCooldown !== undefined ? customCooldown : cooldownPeriod;
-    
+
     const currentTime = Math.floor(Date.now() / 1000);
-    
+
     if (currentLastClaim === 0) {
       setCanClaim(true);
       setTimeRemaining("Now");
       return;
     }
-    
+
     const nextClaimTime = currentLastClaim + currentCooldown;
     const timeLeft = nextClaimTime - currentTime;
-    
+
     if (timeLeft <= 0) {
       setCanClaim(true);
       setTimeRemaining("Now");
@@ -135,26 +135,26 @@ export default function FaucetPage() {
       setError(null);
       setSuccess(null);
       setIsLoading(true);
-      
+
       const provider = getProvider();
       const signer = await provider.getSigner();
       const faucet = new ethers.Contract(FAUCET_ADDRESS, faucetAbi, signer);
 
       // Estimate gas
       const gasEstimate = await faucet.claim.estimateGas();
-      
+
       // Send transaction
       const tx = await faucet.claim();
-      
+
       setTxHash(tx.hash);
       setSuccess("Transaction submitted! Waiting for confirmation...");
 
       // Wait for confirmation
       const receipt = await tx.wait();
-      
+
       if (receipt.status === 1) {
         setSuccess(`Success! ${faucetClaimAmount} tokens claimed!`);
-        
+
         // Refresh faucet data
         setTimeout(() => {
           loadFaucetData();
@@ -164,7 +164,23 @@ export default function FaucetPage() {
       }
     } catch (err: any) {
       console.error("Claim error:", err);
-      
+
+      if (err.message?.includes("execution reverted (unknown custom error)") ||
+        err.message?.includes("unknown custom error")) {
+
+        if (err.data && err.data !== "0x") {
+          try {
+            const errorSelector = err.data.slice(0, 10); 
+            setError("Already Claimed , not allowed.");
+          } catch (decodeError) {
+            return "Contract reverted with an unknown custom error. Check contract requirements.";
+          }
+        }
+
+        return "Transaction failed: Contract reverted with an unknown error.";
+      }
+      if (err.code == 4002)
+        setError("Already Claimed , not allowed.")
       if (err.code === 4001) {
         setError("Transaction rejected by user");
       } else if (err.message?.includes("CooldownActive")) {
@@ -206,7 +222,7 @@ export default function FaucetPage() {
   return (
     <main className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 relative overflow-hidden">
       <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0icmdiYSgyNTEsIDE5MSwgMzYsIDAuMSkiIHN0cm9rZS13aWR0aD0iMSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmlkKSIvPjwvc3ZnPg==')] opacity-40"></div>
-      
+
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <header className="mb-8 animate-fade-in">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
@@ -252,7 +268,7 @@ export default function FaucetPage() {
                   </div>
                 </div>
               </div>
-              
+
               <div className="p-8">
                 <div className="text-center mb-8 animate-bounce-slow">
                   <div className="inline-block p-6 rounded-3xl bg-gradient-to-br from-amber-100 to-orange-100 mb-4 shadow-lg">
@@ -265,11 +281,10 @@ export default function FaucetPage() {
 
                 <div className="space-y-6">
                   <div className="grid grid-cols-2 gap-4">
-                    <div className={`group p-5 rounded-xl border-2 transition-all duration-300 ${
-                      canClaim 
-                        ? 'bg-gradient-to-br from-green-50 to-emerald-50 border-green-200 hover:border-green-300 hover:shadow-lg' 
+                    <div className={`group p-5 rounded-xl border-2 transition-all duration-300 ${canClaim
+                        ? 'bg-gradient-to-br from-green-50 to-emerald-50 border-green-200 hover:border-green-300 hover:shadow-lg'
                         : 'bg-gradient-to-br from-amber-50 to-orange-50 border-amber-200 hover:border-amber-300 hover:shadow-lg'
-                    }`}>
+                      }`}>
                       <div className="text-sm text-amber-600 mb-2 font-medium">Status</div>
                       <div className={`font-bold text-lg flex items-center gap-2 ${canClaim ? 'text-green-600' : 'text-amber-600'}`}>
                         <span className={`text-2xl ${canClaim ? 'animate-bounce' : ''}`}>
@@ -278,7 +293,7 @@ export default function FaucetPage() {
                         {canClaim ? "Ready to Claim" : "On Cooldown"}
                       </div>
                     </div>
-                    
+
                     <div className="group p-5 rounded-xl bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-amber-200 hover:border-amber-300 hover:shadow-lg transition-all duration-300">
                       <div className="text-sm text-amber-600 mb-2 font-medium">Next Claim In</div>
                       <div className="font-bold text-lg text-amber-700 flex items-center gap-2">
@@ -339,7 +354,7 @@ export default function FaucetPage() {
                     <div className="p-5 bg-gradient-to-r from-blue-50 to-cyan-50 border-2 border-blue-200 rounded-xl shadow-md animate-fade-in-up">
                       <div className="text-sm text-blue-600 mb-2 font-semibold">Transaction Hash:</div>
                       <div className="font-mono text-sm break-all text-blue-700 mb-3 bg-white/50 p-3 rounded-lg">{txHash}</div>
-                      <a 
+                      <a
                         href={`https://sepolia.etherscan.io/tx/${txHash}`}
                         target="_blank"
                         rel="noopener noreferrer"
@@ -405,7 +420,7 @@ export default function FaucetPage() {
                   </div>
                 ))}
               </div>
-              
+
               <div className="mt-6 pt-6 border-t-2 border-amber-100">
                 <div className="flex items-start gap-3 p-3 bg-amber-50 rounded-xl">
                   <span className="text-xl">ℹ️</span>
@@ -424,8 +439,8 @@ export default function FaucetPage() {
                 <h3 className="text-xl font-bold text-amber-900">Quick Links</h3>
               </div>
               <div className="space-y-3">
-                <Link 
-                  href="/dashboard" 
+                <Link
+                  href="/dashboard"
                   className="flex items-center justify-between p-4 bg-white rounded-xl border-2 border-amber-200 hover:border-amber-400 hover:shadow-md hover:scale-105 transition-all duration-300"
                 >
                   <span className="text-amber-800 font-semibold flex items-center gap-2">
@@ -434,7 +449,7 @@ export default function FaucetPage() {
                   </span>
                   <span className="text-amber-500 text-xl">→</span>
                 </Link>
-                <button 
+                <button
                   onClick={loadFaucetData}
                   className="w-full flex items-center justify-between p-4 bg-white rounded-xl border-2 border-amber-200 hover:border-amber-400 hover:shadow-md hover:scale-105 transition-all duration-300"
                 >

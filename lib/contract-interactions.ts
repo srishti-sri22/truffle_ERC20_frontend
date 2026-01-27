@@ -280,39 +280,46 @@ export class FaucetContract {
   }
 
 
-  static async refreshAllTokens(userAddress?: string): Promise<{
-    tokenInfo: { name: string; symbol: string };
-    totalSupply: string;
-    owner: string;
-    balance: string;
-    allowance: string;
-  }> {
-    try {
-      const tokenInfo = await TokenContract.getTokenInfo();
-      const totalSupply = await TokenContract.getTotalSupply();
-      const owner = await TokenContract.getOwner();
+  static async refreshAllTokens(
+  userAddress?: string,
+  spender?: string
+): Promise<{
+  tokenInfo: { name: string; symbol: string };
+  totalSupply: string;
+  owner: string;
+  balance: string;
+  allowance: string;
+}> {
+  try {
+    const [tokenInfo, totalSupply, owner] = await Promise.all([
+      TokenContract.getTokenInfo(),
+      TokenContract.getTotalSupply(),
+      TokenContract.getOwner()
+    ]);
 
-      let balance = "0";
-      let allowance = "0";
+    let balance = "0";
+    let allowance = "0";
 
-      if (userAddress) {
-        [balance, allowance] = await Promise.all([
-          TokenContract.getBalance(userAddress),
-          TokenContract.getAllowance(userAddress, "0x0000000000000000000000000000000000000000") // Default to zero address
-        ]);
+    if (userAddress) {
+      balance = await TokenContract.getBalance(userAddress);
+
+      if (spender) {
+        allowance = await TokenContract.getAllowance(userAddress, spender);
       }
-
-      return {
-        tokenInfo,
-        totalSupply,
-        owner,
-        balance,
-        allowance
-      };
-    } catch (error) {
-      console.error("Error refreshing token data:", error);
-      throw new Error(parseContractError(error));
     }
+
+    return {
+      tokenInfo,
+      totalSupply,
+      owner,
+      balance,
+      allowance
+    };
+  } catch (error) {
+    console.error("Error refreshing token data:", error);
+    throw new Error(parseContractError(error));
   }
+}
+
 
 }
