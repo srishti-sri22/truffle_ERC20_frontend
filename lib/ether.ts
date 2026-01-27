@@ -2,19 +2,15 @@ import { http, createConfig } from 'wagmi'
 import { mainnet, sepolia, polygonAmoy, arbitrum, optimism } from 'wagmi/chains'
 import { injected, walletConnect, coinbaseWallet } from 'wagmi/connectors'
 
-// WalletConnect Project ID - Get from https://cloud.walletconnect.com
-const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || 'YOUR_PROJECT_ID'
+const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || 'b3a7f363d57e887cab21aabca29f97a7'
 
-// Configure wagmi with multiple chains and connectors
 export const config = createConfig({
   chains: [mainnet, sepolia, polygonAmoy, arbitrum, optimism],
   connectors: [
-    // Injected connector for browser extension wallets (MetaMask, Phantom, etc.)
     injected({
       shimDisconnect: true,
     }),
     
-    // WalletConnect for mobile wallets and additional browser wallets
     walletConnect({
       projectId,
       metadata: {
@@ -26,7 +22,6 @@ export const config = createConfig({
       showQrModal: true,
     }),
     
-    // Coinbase Wallet
     coinbaseWallet({
       appName: 'Truffle Token Faucet',
       darkMode: true,
@@ -41,7 +36,6 @@ export const config = createConfig({
   },
 })
 
-// Helper function to detect installed wallets
 export const detectInstalledWallets = () => {
   if (typeof window === 'undefined') return {}
 
@@ -64,7 +58,6 @@ export const detectInstalledWallets = () => {
   return installed
 }
 
-// Chain name mapping
 export const chainNames: Record<number, string> = {
   1: 'Ethereum',
   11155111: 'Sepolia',
@@ -73,7 +66,6 @@ export const chainNames: Record<number, string> = {
   10: 'Optimism',
 }
 
-// Get chain name by ID
 export const getChainName = (chainId: number): string => {
   return chainNames[chainId] || `Chain ${chainId}`
 }
