@@ -1,7 +1,10 @@
 import { ethers } from "ethers";
 
-export const TOKEN_ADDRESS = process.env.NEXT_PUBLIC_TOKEN_ADDRESS_SEPOLIA as string;
-export const FAUCET_ADDRESS = process.env.NEXT_PUBLIC_FAUCET_ADDRESS_SEPOLIA as string;
+// export const TOKEN_ADDRESS = process.env.NEXT_PUBLIC_TOKEN_ADDRESS_SEPOLIA as string;
+// export const FAUCET_ADDRESS = process.env.NEXT_PUBLIC_FAUCET_ADDRESS_SEPOLIA as string;
+
+export const TOKEN_ADDRESS ="0xfa8D28F3c28b7D4Cc44015bEC986b0c4D63CC7B8";
+export const FAUCET_ADDRESS = "0xe746C6A272D50A90C134a3DE3fAC32f72c9528c1";
 
 export interface CustomError {
   name: string;
