@@ -104,15 +104,12 @@ export default function Navbar() {
     const installed = installedWallets[walletId]
     
     try {
-      // Find the appropriate connector
       let connector
       
       if (walletId === 'metamask' || walletId === 'phantom' || walletId === 'trust' || walletId === 'rainbow') {
-        // If wallet is installed, use injected connector
         if (installed) {
           connector = connectors.find(c => c.type === 'injected')
         } else {
-          // Fallback to WalletConnect for non-installed wallets
           connector = connectors.find(c => c.type === 'walletConnect')
         }
       } else if (walletId === 'coinbase') {
@@ -139,7 +136,6 @@ export default function Navbar() {
     <nav className="sticky top-0 z-50 bg-gradient-to-r from-amber-50 via-orange-50 to-yellow-50 border-b-2 border-amber-200/50 backdrop-blur-sm shadow-lg">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
-          {/* Logo */}
           <Link href="/" className="flex items-center gap-3 group">
             <div className="p-2.5 rounded-xl bg-gradient-to-br from-amber-600 to-amber-800 shadow-md group-hover:shadow-xl group-hover:scale-110 transition-all duration-300">
               <Image 
@@ -158,7 +154,6 @@ export default function Navbar() {
             </div>
           </Link>
 
-          {/* Navigation Links */}
           <div className="hidden md:flex items-center gap-6">
             <Link 
               href="/" 
@@ -183,7 +178,6 @@ export default function Navbar() {
             </Link>
           </div>
 
-          {/* Wallet Connection */}
           <div className="relative">
             {!isConnected ? (
               <div className="relative">
@@ -215,7 +209,6 @@ export default function Navbar() {
                   )}
                 </button>
 
-                {/* Wallet Menu Dropdown */}
                 {isWalletMenuOpen && !isPending && (
                   <div className="absolute right-0 mt-2 w-72 bg-white rounded-2xl shadow-2xl border-2 border-amber-200 overflow-hidden animate-slide-down">
                     <div className="p-4 bg-gradient-to-r from-amber-100 to-orange-100 border-b-2 border-amber-200">
@@ -264,7 +257,6 @@ export default function Navbar() {
               </div>
             ) : (
               <div className="flex items-center gap-3">
-                {/* Network Badge */}
                 <div className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-xl bg-white/80 border border-amber-200 shadow-sm">
                   <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
                   <span className="text-sm font-medium text-amber-700">
@@ -272,7 +264,6 @@ export default function Navbar() {
                   </span>
                 </div>
 
-                {/* Address Display */}
                 <div className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 shadow-sm">
                   <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
                   <span className="text-green-700 font-mono font-medium text-sm">
@@ -280,7 +271,6 @@ export default function Navbar() {
                   </span>
                 </div>
 
-                {/* Disconnect Button */}
                 <button
                   onClick={handleDisconnect}
                   className="px-4 py-2.5 rounded-xl bg-white border border-amber-200 text-amber-700 font-medium text-sm hover:bg-amber-50 hover:border-amber-300 hover:shadow-md transition-all duration-300"

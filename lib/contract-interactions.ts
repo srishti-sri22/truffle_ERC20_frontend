@@ -9,7 +9,6 @@ import {
   parseContractError
 } from "./contracts";
 
-const DEPLOYER_ADDRESS = "0x5c876847c2a93E231E00A93386D5F0514B6Dc641";
 
 export class TokenContract {
   static async getBalance(address: string): Promise<string> {
